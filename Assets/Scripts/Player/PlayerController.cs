@@ -19,15 +19,17 @@ public class PlayerController : MonoBehaviour {
 
     [SerializeField] float acceleration;
     [SerializeField] float directionThreshold;
+    [SerializeField] AnimationCurve staminaUsed;
     [SerializeField] List<SpeedTierValues> speedTierValues;
 
     private Rigidbody _rb;
     private PlayerAnimation _animation;
+    private Stamina _stamina;
 
-    private int currentSpeedTier;
-    private float currentMinSpeed;
-    private float currentMaxSpeed;
-    private float currentSpeed;
+    private int _currentSpeedTier;
+    private float _currentMinSpeed;
+    private float _currentMaxSpeed;
+    private float _currentSpeed;
 
     private Vector3 oldDirection;
 
@@ -40,17 +42,18 @@ public class PlayerController : MonoBehaviour {
         }
 
         _animation = GetComponent<PlayerAnimation>();
+        _stamina = GetComponent<Stamina>();
 
-        currentSpeedTier = 0;
+        _currentSpeedTier = 0;
         if (speedTierValues.Count > 0) {
-            currentMinSpeed = speedTierValues[0].minSpeed;
-            currentMaxSpeed = speedTierValues[0].maxSpeed;
+            _currentMinSpeed = speedTierValues[0].minSpeed;
+            _currentMaxSpeed = speedTierValues[0].maxSpeed;
         } else {
-            currentMinSpeed = 0;
-            currentMaxSpeed = 0;
+            _currentMinSpeed = 0;
+            _currentMaxSpeed = 0;
         }
 
-        currentSpeed = 0;
+        _currentSpeed = 0;
 
         direction = transform.forward;
         oldDirection = direction;
@@ -66,29 +69,36 @@ public class PlayerController : MonoBehaviour {
     private void CalculateSpeed()
     {
         if (isGoingForward){
-            currentSpeed += acceleration * Time.deltaTime;
+            _currentSpeed += acceleration * Time.deltaTime;
         } else {
-            currentSpeed -= acceleration * Time.deltaTime;
+            _currentSpeed -= acceleration * Time.deltaTime;
         }
 
-        currentSpeed = Mathf.Clamp(currentSpeed, currentMinSpeed, currentMaxSpeed);
+        _currentSpeed = Mathf.Clamp(_currentSpeed, _currentMinSpeed, _currentMaxSpeed);
     }
 
     private void Move()
     {
-        if (currentSpeed != 0)
+        if (_currentSpeed != 0)
         {
-            if (direction.sqrMagnitude < directionThreshold)
+            if (_stamina.UseStamina(staminaUsed.Evaluate(_currentSpeed) * Time.deltaTime))
             {
-                _rb.MovePosition(transform.position + Quaternion.LookRotation(oldDirection, Vector3.up) * transform.forward * currentSpeed * Time.deltaTime);
+                if (direction.sqrMagnitude < directionThreshold)
+                {
+                    _rb.MovePosition(transform.position + Quaternion.LookRotation(oldDirection, Vector3.up) * transform.forward * _currentSpeed * Time.deltaTime);
+                }
+                else
+                {
+                    _rb.MovePosition(transform.position + Quaternion.LookRotation(direction, Vector3.up) * transform.forward * _currentSpeed * Time.deltaTime);
+                    _animation.Rotate(direction);
+                    oldDirection = direction;
+                }
+                _animation.SetMoving(true);
             }
             else
             {
-                _rb.MovePosition(transform.position + Quaternion.LookRotation(direction, Vector3.up) * transform.forward * currentSpeed * Time.deltaTime);
-                oldDirection = direction;
+                _animation.SetMoving(false);
             }
-            _animation.SetMoving(true);
-            _animation.Rotate(oldDirection);
         }
         else
         {
@@ -98,24 +108,24 @@ public class PlayerController : MonoBehaviour {
 
     public void TryIncreaseSpeedTier()
     {
-        if(currentSpeedTier < speedTierValues.Count - 1 && currentSpeedTier >= 0) {
-            if(currentSpeed == currentMaxSpeed) {
+        if(_currentSpeedTier < speedTierValues.Count - 1 && _currentSpeedTier >= 0) {
+            if(_currentSpeed == _currentMaxSpeed) {
                 _animation.IncreaseSpeedTier();
-                currentSpeedTier++;
-                currentMinSpeed = speedTierValues[currentSpeedTier].minSpeed;
-                currentMaxSpeed = speedTierValues[currentSpeedTier].maxSpeed;
+                _currentSpeedTier++;
+                _currentMinSpeed = speedTierValues[_currentSpeedTier].minSpeed;
+                _currentMaxSpeed = speedTierValues[_currentSpeedTier].maxSpeed;
             }
         }
     }
 
     public void TryDecreaseSpeedTier()
     {
-        if (currentSpeedTier < speedTierValues.Count && currentSpeedTier > 0) {
-            if (currentSpeed == currentMinSpeed) {
+        if (_currentSpeedTier < speedTierValues.Count && _currentSpeedTier > 0) {
+            if (_currentSpeed == _currentMinSpeed) {
                 _animation.DecreaseSpeedTier();
-                currentSpeedTier--;
-                currentMinSpeed = speedTierValues[currentSpeedTier].minSpeed;
-                currentMaxSpeed = speedTierValues[currentSpeedTier].maxSpeed;
+                _currentSpeedTier--;
+                _currentMinSpeed = speedTierValues[_currentSpeedTier].minSpeed;
+                _currentMaxSpeed = speedTierValues[_currentSpeedTier].maxSpeed;
             }
         }
     }
