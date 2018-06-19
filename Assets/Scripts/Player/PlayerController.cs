@@ -70,9 +70,9 @@ public class PlayerController : MonoBehaviour {
     private void CalculateSpeed()
     {
         if (isGoingForward){
-            currentSpeed += acceleration = Time.deltaTime;
+            currentSpeed += acceleration * Time.deltaTime;
         } else {
-            currentSpeed -= acceleration = Time.deltaTime;
+            currentSpeed -= acceleration * Time.deltaTime;
         }
 
         currentSpeed = Mathf.Clamp(currentSpeed, currentMinSpeed, currentMaxSpeed);
