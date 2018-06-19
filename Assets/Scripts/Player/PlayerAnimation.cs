@@ -36,4 +36,10 @@ public class PlayerAnimation : MonoBehaviour {
             _model_1_Animator.SetTrigger("DecreaseSpeedTier");
         }
     }
+
+
+    public void Rotate(Vector3 direction)
+    {
+        model_1.transform.LookAt(model_1.transform.position + Quaternion.LookRotation(direction, Vector3.up) * transform.forward);
+    }
 }

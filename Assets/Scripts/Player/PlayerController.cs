@@ -12,12 +12,13 @@ public class PlayerController : MonoBehaviour {
         public float maxSpeed;
     }
 
+    [HideInInspector]
     public bool isGoingForward = false;
-    [Range(-1, 1)]
-    public float rotationDirection = 0;
+    [HideInInspector]
+    public Vector3 direction;
 
-    [SerializeField] float rotationSpeed;
     [SerializeField] float acceleration;
+    [SerializeField] float directionThreshold;
     [SerializeField] List<SpeedTierValues> speedTierValues;
 
     private Rigidbody _rb;
@@ -27,6 +28,8 @@ public class PlayerController : MonoBehaviour {
     private float currentMinSpeed;
     private float currentMaxSpeed;
     private float currentSpeed;
+
+    private Vector3 oldDirection;
 
     void Start ()
     {
@@ -48,23 +51,16 @@ public class PlayerController : MonoBehaviour {
         }
 
         currentSpeed = 0;
+
+        direction = transform.forward;
+        oldDirection = direction;
     }
 	
 	void FixedUpdate ()
     {
-        Rotate();
-
         CalculateSpeed();
 
         Move();
-    }
-
-    private void Rotate()
-    {
-        if(rotationDirection != 0) {
-            float newY = transform.eulerAngles.y + (rotationDirection * rotationSpeed * Time.deltaTime);
-            _rb.MoveRotation(Quaternion.Euler(0, newY, 0));
-        }
     }
 
     private void CalculateSpeed()
@@ -80,10 +76,22 @@ public class PlayerController : MonoBehaviour {
 
     private void Move()
     {
-        if(currentSpeed != 0) {
-            _rb.MovePosition(transform.position + transform.forward * currentSpeed * Time.deltaTime);
+        if (currentSpeed != 0)
+        {
+            if (direction.sqrMagnitude < directionThreshold)
+            {
+                _rb.MovePosition(transform.position + Quaternion.LookRotation(oldDirection, Vector3.up) * transform.forward * currentSpeed * Time.deltaTime);
+            }
+            else
+            {
+                _rb.MovePosition(transform.position + Quaternion.LookRotation(direction, Vector3.up) * transform.forward * currentSpeed * Time.deltaTime);
+                oldDirection = direction;
+            }
             _animation.SetMoving(true);
-        } else {
+            _animation.Rotate(oldDirection);
+        }
+        else
+        {
             _animation.SetMoving(false);
         }
     }

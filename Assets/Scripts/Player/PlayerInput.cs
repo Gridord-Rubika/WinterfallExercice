@@ -12,8 +12,7 @@ public class PlayerInput : MonoBehaviour {
 
     void Start () {
         _controller = GetComponent<PlayerController>();
-        if(_controller == null)
-        {
+        if(_controller == null) {
             _controller = gameObject.AddComponent<PlayerController>();
         }
     }
@@ -26,25 +25,22 @@ public class PlayerInput : MonoBehaviour {
             _controller.isGoingForward = false;
         }
 
-        _controller.rotationDirection = Input.GetAxis("Horizontal");
+        Vector3 dir = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+        _controller.direction = dir;
 
-        if (Input.GetAxisRaw("IncreaseSpeedTier") == 1 && !incPressed)
-        {
+        if (Input.GetAxisRaw("IncreaseSpeedTier") == 1 && !incPressed) {
             _controller.TryIncreaseSpeedTier();
             incPressed = true;
         }
-        else if(Input.GetAxisRaw("IncreaseSpeedTier") == 0)
-        {
+        else if(Input.GetAxisRaw("IncreaseSpeedTier") == 0) {
             incPressed = false;
         }
 
-        if (Input.GetAxisRaw("DecreaseSpeedTier") == 1 && !decPressed)
-        {
+        if (Input.GetAxisRaw("DecreaseSpeedTier") == 1 && !decPressed) {
             _controller.TryDecreaseSpeedTier();
             decPressed = true;
         }
-        else if (Input.GetAxisRaw("DecreaseSpeedTier") == 0)
-        {
+        else if (Input.GetAxisRaw("DecreaseSpeedTier") == 0) {
             decPressed = false;
         }
 
