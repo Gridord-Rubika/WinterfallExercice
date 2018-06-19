@@ -19,18 +19,24 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] float rotationSpeed;
     [SerializeField] float acceleration;
     [SerializeField] List<SpeedTierValues> speedTierValues;
-    
+
     private Rigidbody _rb;
+    private PlayerAnimation _animation;
+
     private int currentSpeedTier;
     private float currentMinSpeed;
     private float currentMaxSpeed;
     private float currentSpeed;
 
-    void Start () {
+    void Start ()
+    {
         _rb = GetComponent<Rigidbody>();
-        if (_rb == null) {
+        if (_rb == null)
+        {
             _rb = gameObject.AddComponent<Rigidbody>();
         }
+
+        _animation = GetComponent<PlayerAnimation>();
 
         currentSpeedTier = 0;
         if (speedTierValues.Count > 0) {
@@ -76,6 +82,9 @@ public class PlayerController : MonoBehaviour {
     {
         if(currentSpeed != 0) {
             _rb.MovePosition(transform.position + transform.forward * currentSpeed * Time.deltaTime);
+            _animation.SetMoving(true);
+        } else {
+            _animation.SetMoving(false);
         }
     }
 
@@ -83,6 +92,7 @@ public class PlayerController : MonoBehaviour {
     {
         if(currentSpeedTier < speedTierValues.Count - 1 && currentSpeedTier >= 0) {
             if(currentSpeed == currentMaxSpeed) {
+                _animation.IncreaseSpeedTier();
                 currentSpeedTier++;
                 currentMinSpeed = speedTierValues[currentSpeedTier].minSpeed;
                 currentMaxSpeed = speedTierValues[currentSpeedTier].maxSpeed;
@@ -94,6 +104,7 @@ public class PlayerController : MonoBehaviour {
     {
         if (currentSpeedTier < speedTierValues.Count && currentSpeedTier > 0) {
             if (currentSpeed == currentMinSpeed) {
+                _animation.DecreaseSpeedTier();
                 currentSpeedTier--;
                 currentMinSpeed = speedTierValues[currentSpeedTier].minSpeed;
                 currentMaxSpeed = speedTierValues[currentSpeedTier].maxSpeed;
