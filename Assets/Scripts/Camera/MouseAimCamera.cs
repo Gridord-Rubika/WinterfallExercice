@@ -4,13 +4,16 @@ using UnityEngine;
 
 public class MouseAimCamera : MonoBehaviour
 {
-    public GameObject targetLookAt;
-    public GameObject targetToRotate;
-    public float rotateSpeed = 5;
-    [SerializeField] float angleOffset;
+    [SerializeField] GameObject targetLookAt;
+    [SerializeField] GameObject targetToRotate;
+    [SerializeField] float rotateSpeedX = 5;
+    [SerializeField] float rotateSpeedY = 1;
+    [SerializeField] float minXAngle;
+    [SerializeField] float maxXAngle;
 
     private Vector3 _offset;
     private Rigidbody _rb;
+    private float angleOffsetX = 0;
 
     void Start()
     {
@@ -20,11 +23,12 @@ public class MouseAimCamera : MonoBehaviour
 
     void LateUpdate()
     {
-        float horizontal = Input.GetAxis("Mouse X") * rotateSpeed;
+        float horizontal = Input.GetAxis("Mouse X") * rotateSpeedX;
         _rb.MoveRotation(Quaternion.Euler(0, targetToRotate.transform.eulerAngles.y + horizontal, 0));
 
         float desiredAngle = targetLookAt.transform.eulerAngles.y;
-        Quaternion rotation = Quaternion.Euler(angleOffset, desiredAngle, 0);
+        angleOffsetX = Mathf.Clamp(angleOffsetX - Input.GetAxis("Mouse Y") * rotateSpeedY, minXAngle, maxXAngle);
+        Quaternion rotation = Quaternion.Euler(angleOffsetX, desiredAngle, 0);
         transform.position = targetLookAt.transform.position - (rotation * _offset);
 
         transform.LookAt(targetLookAt.transform);

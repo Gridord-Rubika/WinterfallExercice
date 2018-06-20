@@ -64,53 +64,55 @@ public class PlayerController : MonoBehaviour {
 	
 	void FixedUpdate ()
     {
+        CalculateDirection();
+
         CalculateSpeed();
+
+        Rotate();
 
         Move();
     }
 
+    private void CalculateDirection()
+    {
+        if (direction.sqrMagnitude < directionThreshold * directionThreshold) {
+            direction = oldDirection;
+        } else {
+            if (_currentSpeedTier >= speedTierFromWhereOnlyForward) {
+                direction.z = 1;
+            }
+            oldDirection = direction;
+        }
+    }
+
     private void CalculateSpeed()
     {
-        if (isGoingForward){
+        if (isGoingForward)
+        {
             _currentSpeed += acceleration * Time.deltaTime;
-        } else {
+        }
+        else
+        {
             _currentSpeed -= acceleration * Time.deltaTime;
         }
 
         _currentSpeed = Mathf.Clamp(_currentSpeed, _currentMinSpeed, _currentMaxSpeed);
     }
 
+    public void Rotate()
+    {
+        _animation.Rotate(direction);
+    }
+
     private void Move()
     {
-        if (_currentSpeed != 0)
-        {
-            if (_stamina.UseStamina(staminaUsed.Evaluate(_currentSpeed) * Time.deltaTime))
-            {
-                if (direction.sqrMagnitude < directionThreshold)
-                {
-                    _rb.MovePosition(transform.position + Quaternion.LookRotation(oldDirection, Vector3.up) * transform.forward * _currentSpeed * Time.deltaTime);
-                }
-                else
-                {
-                    if(_currentSpeedTier >= speedTierFromWhereOnlyForward)
-                    {
-                        direction.z = 1;
-                    }
-                    _rb.MovePosition(transform.position + Quaternion.LookRotation(direction, Vector3.up) * transform.forward * _currentSpeed * Time.deltaTime);
-                    _animation.Rotate(direction);
-                    oldDirection = direction;
-                }
-                _animation.SetMoving(true);
-            }
-            else
-            {
-                _animation.SetMoving(false);
-            }
-        }
-        else
-        {
+        if (_currentSpeed != 0 && _stamina.UseStamina(staminaUsed.Evaluate(_currentSpeed) * Time.deltaTime)) {
+            _rb.MovePosition(transform.position + Quaternion.LookRotation(direction, Vector3.up) * transform.forward * _currentSpeed * Time.deltaTime);
+            _animation.SetMoving(true);
+        } else {
             _animation.SetMoving(false);
         }
+
     }
 
     public void TryIncreaseSpeedTier()
