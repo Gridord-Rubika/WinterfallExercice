@@ -2217,19 +2217,16 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
+  speedTierFromWhereOnlyForward: 2
   speedTierValues:
   - minSpeed: 0
     maxSpeed: 1
-    amountOfStaminaUsedPerSecond: 1
   - minSpeed: 1
     maxSpeed: 3
-    amountOfStaminaUsedPerSecond: 3
   - minSpeed: 2
     maxSpeed: 5
-    amountOfStaminaUsedPerSecond: 6
   - minSpeed: 3
     maxSpeed: 8
-    amountOfStaminaUsedPerSecond: 10
 --- !u!114 &707158812
 MonoBehaviour:
   m_ObjectHideFlags: 0

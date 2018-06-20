@@ -11,6 +11,11 @@ public class PlayerAnimation : MonoBehaviour {
     void Start ()
     {
         _model_1_Animator = model_1.GetComponent<Animator>();
+        Stamina s = GetComponent<Stamina>();
+        if(s != null)
+        {
+            s.ExhaustedChanged += SetExhausted;
+        }
     }
 
     public void SetMoving(bool isMoving)
@@ -18,6 +23,14 @@ public class PlayerAnimation : MonoBehaviour {
         if (_model_1_Animator != null)
         {
             _model_1_Animator.SetBool("Moving", isMoving);
+        }
+    }
+
+    public void SetExhausted(bool isExhausted)
+    {
+        if (_model_1_Animator != null)
+        {
+            _model_1_Animator.SetBool("Exhausted", isExhausted);
         }
     }
 

@@ -16,6 +16,9 @@ public class Stamina : MonoBehaviour {
     [SerializeField] Color colorFullStamina;
     [SerializeField] Color colorEmptyStamina;
 
+    public delegate void ExhaustedHandler(bool isExhausted);
+    public event ExhaustedHandler ExhaustedChanged;
+
     void Start () {
         _currentStamina = maxStamina;
         staminaGauge.fillAmount = 1;
@@ -41,6 +44,11 @@ public class Stamina : MonoBehaviour {
         {
             _currentStamina = 0;
             _isExhausted = true;
+
+            if (ExhaustedChanged != null) {
+                ExhaustedChanged(true);
+            }
+
             Invoke("RecoveredFromExhaustion", timeOfRestAfterExhaustion);
         }
 
@@ -50,6 +58,10 @@ public class Stamina : MonoBehaviour {
     private void RecoveredFromExhaustion()
     {
         _isExhausted = false;
+
+        if (ExhaustedChanged != null) {
+            ExhaustedChanged(false);
+        }
     }
 
     public bool IsExhausted()

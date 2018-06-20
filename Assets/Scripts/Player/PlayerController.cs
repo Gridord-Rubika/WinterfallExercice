@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] float acceleration;
     [SerializeField] float directionThreshold;
     [SerializeField] AnimationCurve staminaUsed;
+    [SerializeField] int speedTierFromWhereOnlyForward;
     [SerializeField] List<SpeedTierValues> speedTierValues;
 
     private Rigidbody _rb;
@@ -44,6 +45,8 @@ public class PlayerController : MonoBehaviour {
         _animation = GetComponent<PlayerAnimation>();
         _stamina = GetComponent<Stamina>();
 
+        _stamina.ExhaustedChanged += ExhaustedHandler;
+
         _currentSpeedTier = 0;
         if (speedTierValues.Count > 0) {
             _currentMinSpeed = speedTierValues[0].minSpeed;
@@ -55,7 +58,7 @@ public class PlayerController : MonoBehaviour {
 
         _currentSpeed = 0;
 
-        direction = transform.forward;
+        direction = Vector3.forward;
         oldDirection = direction;
     }
 	
@@ -89,6 +92,10 @@ public class PlayerController : MonoBehaviour {
                 }
                 else
                 {
+                    if(_currentSpeedTier >= speedTierFromWhereOnlyForward)
+                    {
+                        direction.z = 1;
+                    }
                     _rb.MovePosition(transform.position + Quaternion.LookRotation(direction, Vector3.up) * transform.forward * _currentSpeed * Time.deltaTime);
                     _animation.Rotate(direction);
                     oldDirection = direction;
@@ -109,7 +116,7 @@ public class PlayerController : MonoBehaviour {
     public void TryIncreaseSpeedTier()
     {
         if(_currentSpeedTier < speedTierValues.Count - 1 && _currentSpeedTier >= 0) {
-            if(_currentSpeed == _currentMaxSpeed) {
+            if (_currentSpeed == _currentMaxSpeed && direction.z > 0.9f) {
                 _animation.IncreaseSpeedTier();
                 _currentSpeedTier++;
                 _currentMinSpeed = speedTierValues[_currentSpeedTier].minSpeed;
@@ -127,6 +134,17 @@ public class PlayerController : MonoBehaviour {
                 _currentMinSpeed = speedTierValues[_currentSpeedTier].minSpeed;
                 _currentMaxSpeed = speedTierValues[_currentSpeedTier].maxSpeed;
             }
+        }
+    }
+
+    public void ExhaustedHandler(bool isExhausted)
+    {
+        if(speedTierValues.Count > 0)
+        {
+            _currentSpeedTier = 0;
+            _currentSpeed = 0;
+            _currentMinSpeed = speedTierValues[0].minSpeed;
+            _currentMaxSpeed = speedTierValues[0].maxSpeed;
         }
     }
 }
