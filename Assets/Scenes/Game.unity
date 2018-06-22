@@ -2197,24 +2197,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   directionThreshold: 0.3
-  staminaUsed:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 2
-      time: 0
-      value: 0
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 0
-    - serializedVersion: 2
-      time: 8
-      value: 10
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 0
   speedTierFromWhereOnlyForward: 2
 --- !u!114 &707158812
 MonoBehaviour:
@@ -2257,6 +2239,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   acceleration: 2
   directionForwardThreshold: 0.9
+  staminaUsed:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 2
+      time: 0
+      value: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 0
+    - serializedVersion: 2
+      time: 8
+      value: 10
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
   speedTierValues:
   - minSpeed: 0
     maxSpeed: 1

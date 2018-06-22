@@ -10,12 +10,10 @@ public class PlayerController : MonoBehaviour {
     [HideInInspector]
 
     [SerializeField] float directionThreshold;
-    [SerializeField] AnimationCurve staminaUsed;
     [SerializeField] int speedTierFromWhereOnlyForward;
 
     private Rigidbody _rb;
     private PlayerAnimation _animation;
-    private StaminaSystem _stamina;
     private SpeedSystem _speed;
 
     private Vector3 _direction;
@@ -29,7 +27,6 @@ public class PlayerController : MonoBehaviour {
         }
 
         _animation = GetComponent<PlayerAnimation>();
-        _stamina = GetComponent<StaminaSystem>();
         _speed = GetComponent<SpeedSystem>();
 
         _direction = Vector3.forward;
@@ -58,7 +55,7 @@ public class PlayerController : MonoBehaviour {
 
     private void Move() {
         float currentSpeed = _speed.GetCurrentSpeed();
-        if (currentSpeed != 0 && _stamina.UseStamina(staminaUsed.Evaluate(currentSpeed) * Time.deltaTime)) {
+        if (currentSpeed != 0) {
             _rb.MovePosition(transform.position + Quaternion.LookRotation(_direction, Vector3.up) * transform.forward * currentSpeed * Time.deltaTime);
             _animation.SetMoving(true);
         } else {

@@ -13,6 +13,7 @@ public class SpeedSystem : MonoBehaviour {
 
     [SerializeField] float acceleration;
     [SerializeField] float directionForwardThreshold = 0.9f;
+    [SerializeField] AnimationCurve staminaUsed;
     [SerializeField] List<SpeedTierValues> speedTierValues;
 
     private int _currentSpeedTier;
@@ -21,7 +22,10 @@ public class SpeedSystem : MonoBehaviour {
     private float _currentSpeed;
     private bool _isGoingForward;
 
-    
+    private StaminaSystem _stamina;
+
+
+
     public delegate void IncreaseSpeedTierHandler();
     public event IncreaseSpeedTierHandler SpeedTierIncreased;
     
@@ -30,10 +34,10 @@ public class SpeedSystem : MonoBehaviour {
 
     void Start ()
     {
-        StaminaSystem stamina = GetComponent<StaminaSystem>();
+        _stamina = GetComponent<StaminaSystem>();
 
-        if(stamina != null) {
-            stamina.ExhaustedChanged += ExhaustedHandler;
+        if(_stamina != null) {
+            _stamina.ExhaustedChanged += ExhaustedHandler;
         }
 
         _currentSpeedTier = 0;
@@ -55,13 +59,18 @@ public class SpeedSystem : MonoBehaviour {
 
     public void CalculateSpeed()
     {
-        if (_isGoingForward) {
-            _currentSpeed += acceleration * Time.deltaTime;
-        } else {
-            _currentSpeed -= acceleration * Time.deltaTime;
-        }
+        if(_stamina == null || _stamina.UseStamina(staminaUsed.Evaluate(_currentSpeed) * Time.deltaTime)){
 
-        _currentSpeed = Mathf.Clamp(_currentSpeed, _currentMinSpeed, _currentMaxSpeed);
+            if (_isGoingForward) {
+                _currentSpeed += acceleration * Time.deltaTime;
+            } else {
+                _currentSpeed -= acceleration * Time.deltaTime;
+            }
+
+            _currentSpeed = Mathf.Clamp(_currentSpeed, _currentMinSpeed, _currentMaxSpeed);
+        } else {
+            _currentSpeed = 0;
+        }
     }
 
     public void TryIncreaseSpeedTier(Vector3 direction)
