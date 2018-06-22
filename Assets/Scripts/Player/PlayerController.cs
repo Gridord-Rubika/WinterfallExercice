@@ -3,39 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(StaminaSystem))]
+[RequireComponent(typeof(SpeedSystem))]
 public class PlayerController : MonoBehaviour {
     
-    [System.Serializable]
-    private struct SpeedTierValues
-    {
-        public float minSpeed;
-        public float maxSpeed;
-    }
-
     [HideInInspector]
-    public bool isGoingForward = false;
-    [HideInInspector]
-    public Vector3 direction;
 
-    [SerializeField] float acceleration;
     [SerializeField] float directionThreshold;
     [SerializeField] AnimationCurve staminaUsed;
     [SerializeField] int speedTierFromWhereOnlyForward;
-    [SerializeField] List<SpeedTierValues> speedTierValues;
 
     private Rigidbody _rb;
     private PlayerAnimation _animation;
-    private Stamina _stamina;
+    private StaminaSystem _stamina;
+    private SpeedSystem _speed;
 
-    private int _currentSpeedTier;
-    private float _currentMinSpeed;
-    private float _currentMaxSpeed;
-    private float _currentSpeed;
+    private Vector3 _direction;
+    private Vector3 _oldDirection;
 
-    private Vector3 oldDirection;
-
-    void Start ()
-    {
+    void Start () {
         _rb = GetComponent<Rigidbody>();
         if (_rb == null)
         {
@@ -43,110 +29,45 @@ public class PlayerController : MonoBehaviour {
         }
 
         _animation = GetComponent<PlayerAnimation>();
-        _stamina = GetComponent<Stamina>();
+        _stamina = GetComponent<StaminaSystem>();
+        _speed = GetComponent<SpeedSystem>();
 
-        _stamina.ExhaustedChanged += ExhaustedHandler;
-
-        _currentSpeedTier = 0;
-        if (speedTierValues.Count > 0) {
-            _currentMinSpeed = speedTierValues[0].minSpeed;
-            _currentMaxSpeed = speedTierValues[0].maxSpeed;
-        } else {
-            _currentMinSpeed = 0;
-            _currentMaxSpeed = 0;
-        }
-
-        _currentSpeed = 0;
-
-        direction = Vector3.forward;
-        oldDirection = direction;
+        _direction = Vector3.forward;
+        _oldDirection = _direction;
     }
 	
-	void FixedUpdate ()
-    {
+	void FixedUpdate () {
         CalculateDirection();
 
-        CalculateSpeed();
 
-        Rotate();
+        _animation.Rotate(_direction);
 
         Move();
     }
 
-    private void CalculateDirection()
-    {
-        if (direction.sqrMagnitude < directionThreshold * directionThreshold) {
-            direction = oldDirection;
+    private void CalculateDirection() {
+        if (_direction.sqrMagnitude < directionThreshold * directionThreshold) {
+            _direction = _oldDirection;
         } else {
-            if (_currentSpeedTier >= speedTierFromWhereOnlyForward) {
-                direction.z = 1;
+            if (_speed.GetCurrentSpeedTier() >= speedTierFromWhereOnlyForward) {
+                _direction.z = 1;
             }
-            oldDirection = direction;
+            _oldDirection = _direction;
         }
     }
 
-    private void CalculateSpeed()
-    {
-        if (isGoingForward)
-        {
-            _currentSpeed += acceleration * Time.deltaTime;
-        }
-        else
-        {
-            _currentSpeed -= acceleration * Time.deltaTime;
-        }
-
-        _currentSpeed = Mathf.Clamp(_currentSpeed, _currentMinSpeed, _currentMaxSpeed);
-    }
-
-    public void Rotate()
-    {
-        _animation.Rotate(direction);
-    }
-
-    private void Move()
-    {
-        if (_currentSpeed != 0 && _stamina.UseStamina(staminaUsed.Evaluate(_currentSpeed) * Time.deltaTime)) {
-            _rb.MovePosition(transform.position + Quaternion.LookRotation(direction, Vector3.up) * transform.forward * _currentSpeed * Time.deltaTime);
+    private void Move() {
+        float currentSpeed = _speed.GetCurrentSpeed();
+        if (currentSpeed != 0 && _stamina.UseStamina(staminaUsed.Evaluate(currentSpeed) * Time.deltaTime)) {
+            _rb.MovePosition(transform.position + Quaternion.LookRotation(_direction, Vector3.up) * transform.forward * currentSpeed * Time.deltaTime);
             _animation.SetMoving(true);
         } else {
             _animation.SetMoving(false);
         }
-
     }
 
-    public void TryIncreaseSpeedTier()
+    public void SetDirection(Vector3 direction)
     {
-        if(_currentSpeedTier < speedTierValues.Count - 1 && _currentSpeedTier >= 0) {
-            if (_currentSpeed == _currentMaxSpeed && direction.z > 0.9f) {
-                _animation.IncreaseSpeedTier();
-                _currentSpeedTier++;
-                _currentMinSpeed = speedTierValues[_currentSpeedTier].minSpeed;
-                _currentMaxSpeed = speedTierValues[_currentSpeedTier].maxSpeed;
-            }
-        }
-    }
-
-    public void TryDecreaseSpeedTier()
-    {
-        if (_currentSpeedTier < speedTierValues.Count && _currentSpeedTier > 0) {
-            if (_currentSpeed == _currentMinSpeed) {
-                _animation.DecreaseSpeedTier();
-                _currentSpeedTier--;
-                _currentMinSpeed = speedTierValues[_currentSpeedTier].minSpeed;
-                _currentMaxSpeed = speedTierValues[_currentSpeedTier].maxSpeed;
-            }
-        }
-    }
-
-    public void ExhaustedHandler(bool isExhausted)
-    {
-        if(speedTierValues.Count > 0)
-        {
-            _currentSpeedTier = 0;
-            _currentSpeed = 0;
-            _currentMinSpeed = speedTierValues[0].minSpeed;
-            _currentMaxSpeed = speedTierValues[0].maxSpeed;
-        }
+        _direction = direction;
     }
 }

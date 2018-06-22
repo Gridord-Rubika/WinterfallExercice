@@ -11,10 +11,15 @@ public class PlayerAnimation : MonoBehaviour {
     void Start ()
     {
         _model_1_Animator = model_1.GetComponent<Animator>();
-        Stamina s = GetComponent<Stamina>();
-        if(s != null)
-        {
-            s.ExhaustedChanged += SetExhausted;
+        StaminaSystem stamina = GetComponent<StaminaSystem>();
+        if (stamina != null) {
+            stamina.ExhaustedChanged += SetExhausted;
+        }
+
+        SpeedSystem speed = GetComponent<SpeedSystem>();
+        if (speed != null) {
+            speed.SpeedTierIncreased += IncreaseSpeedTier;
+            speed.SpeedTierDecreased += DecreaseSpeedTier;
         }
     }
 

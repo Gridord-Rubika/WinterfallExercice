@@ -6,30 +6,30 @@ using UnityEngine;
 public class PlayerInput : MonoBehaviour {
 
     private PlayerController _controller;
+    private SpeedSystem _speed;
 
     private bool incPressed = false;
     private bool decPressed = false;
 
     void Start () {
         _controller = GetComponent<PlayerController>();
-        if(_controller == null) {
-            _controller = gameObject.AddComponent<PlayerController>();
-        }
+        _speed = GetComponent<SpeedSystem>();
     }
 	
 	void Update () {
 
         if (Input.GetAxis("Forward") > 0) {
-            _controller.isGoingForward = true;
+            _speed.SetIsGoingForward(true);
         } else {
-            _controller.isGoingForward = false;
+            _speed.SetIsGoingForward(false);
         }
 
-        Vector3 dir = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
-        _controller.direction = dir;
+        Vector3 direction = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+
+        _controller.SetDirection(direction);
 
         if (Input.GetAxisRaw("IncreaseSpeedTier") == 1 && !incPressed) {
-            _controller.TryIncreaseSpeedTier();
+            _speed.TryIncreaseSpeedTier(direction);
             incPressed = true;
         }
         else if(Input.GetAxisRaw("IncreaseSpeedTier") == 0) {
@@ -37,7 +37,7 @@ public class PlayerInput : MonoBehaviour {
         }
 
         if (Input.GetAxisRaw("DecreaseSpeedTier") == 1 && !decPressed) {
-            _controller.TryDecreaseSpeedTier();
+            _speed.TryDecreaseSpeedTier();
             decPressed = true;
         }
         else if (Input.GetAxisRaw("DecreaseSpeedTier") == 0) {

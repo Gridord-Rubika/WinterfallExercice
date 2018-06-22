@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Stamina : MonoBehaviour {
+public class StaminaSystem : MonoBehaviour {
 
     [SerializeField] int maxStamina;
     [SerializeField] float regenPerSecond;

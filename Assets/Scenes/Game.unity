@@ -2120,6 +2120,7 @@ GameObject:
   - component: {fileID: 707158808}
   - component: {fileID: 707158812}
   - component: {fileID: 707158811}
+  - component: {fileID: 707158814}
   - component: {fileID: 707158810}
   - component: {fileID: 707158813}
   m_Layer: 0
@@ -2195,9 +2196,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9e57723a43cad84590f07344d420516, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isGoingForward: 0
-  direction: {x: 0, y: 0, z: 0}
-  acceleration: 2
   directionThreshold: 0.3
   staminaUsed:
     serializedVersion: 2
@@ -2218,15 +2216,6 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 0
   speedTierFromWhereOnlyForward: 2
-  speedTierValues:
-  - minSpeed: 0
-    maxSpeed: 1
-  - minSpeed: 1
-    maxSpeed: 3
-  - minSpeed: 2
-    maxSpeed: 5
-  - minSpeed: 3
-    maxSpeed: 8
 --- !u!114 &707158812
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2255,6 +2244,28 @@ MonoBehaviour:
   staminaGauge: {fileID: 1988071353}
   colorFullStamina: {r: 0.05882353, g: 0.7882353, b: 0.24313726, a: 1}
   colorEmptyStamina: {r: 0.7882353, g: 0.05882353, b: 0.05882353, a: 1}
+--- !u!114 &707158814
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 707158806}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0bc9500c7885bc4092ff4ed166b0c3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  acceleration: 2
+  directionForwardThreshold: 0.9
+  speedTierValues:
+  - minSpeed: 0
+    maxSpeed: 1
+  - minSpeed: 1
+    maxSpeed: 3
+  - minSpeed: 3
+    maxSpeed: 5
+  - minSpeed: 5
+    maxSpeed: 8
 --- !u!1 &744933411
 GameObject:
   m_ObjectHideFlags: 0
