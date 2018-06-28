@@ -5,11 +5,16 @@ using UnityEngine;
 [RequireComponent(typeof(PlayerController))]
 public class PlayerInput : MonoBehaviour {
 
+    [SerializeField] float directionThreshold;
+    [SerializeField] float timeToForcedStop;
+
     private PlayerController _controller;
     private SpeedSystem _speed;
 
-    private bool incPressed = false;
-    private bool decPressed = false;
+    private bool _incPressed = false;
+    private bool _decPressed = false;
+    private float _forcedStopTimer = 0;
+    private bool _forcedStopAlreadyCalled = false;
 
     void Start () {
         _controller = GetComponent<PlayerController>();
@@ -19,29 +24,44 @@ public class PlayerInput : MonoBehaviour {
 	void Update () {
 
         if (Input.GetAxis("Forward") > 0) {
-            _speed.SetIsGoingForward(true);
+            _speed.SetIsAccelerating(true);
         } else {
-            _speed.SetIsGoingForward(false);
+            _speed.SetIsAccelerating(false);
         }
 
         Vector3 direction = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 
-        _controller.SetDirection(direction);
+        if(direction.sqrMagnitude < directionThreshold * directionThreshold) {
+            _controller.SetDirection(Vector3.zero);
+            _speed.SetDirection(Vector3.zero);
+        } else {
+            _controller.SetDirection(direction);
+            _speed.SetDirection(direction);
+        }
 
-        if (Input.GetAxisRaw("IncreaseSpeedTier") == 1 && !incPressed) {
+        if (Input.GetAxisRaw("IncreaseSpeedTier") == 1 && !_incPressed) {
             _speed.TryIncreaseSpeedTier(direction);
-            incPressed = true;
+            _incPressed = true;
         }
         else if(Input.GetAxisRaw("IncreaseSpeedTier") == 0) {
-            incPressed = false;
+            _incPressed = false;
         }
 
-        if (Input.GetAxisRaw("DecreaseSpeedTier") == 1 && !decPressed) {
-            _speed.TryDecreaseSpeedTier();
-            decPressed = true;
+        if (Input.GetAxisRaw("DecreaseSpeedTier") == 1) {
+            if (!_decPressed) {
+                _speed.TryDecreaseSpeedTier();
+                _decPressed = true;
+            }
+            _forcedStopTimer += Time.deltaTime;
+            if (!_forcedStopAlreadyCalled && _forcedStopTimer >= timeToForcedStop) {
+                _speed.TryForcedStop();
+                _forcedStopAlreadyCalled = true;
+            }
         }
         else if (Input.GetAxisRaw("DecreaseSpeedTier") == 0) {
-            decPressed = false;
+            _decPressed = false;
+            _forcedStopTimer = 0;
+            _forcedStopAlreadyCalled = false;
         }
 
     }

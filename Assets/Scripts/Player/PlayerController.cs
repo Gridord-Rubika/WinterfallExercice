@@ -7,11 +7,6 @@ using UnityEngine;
 [RequireComponent(typeof(SpeedSystem))]
 public class PlayerController : MonoBehaviour {
     
-    [HideInInspector]
-
-    [SerializeField] float directionThreshold;
-    [SerializeField] int speedTierFromWhereOnlyForward;
-
     private Rigidbody _rb;
     private PlayerAnimation _animation;
     private SpeedSystem _speed;
@@ -35,20 +30,16 @@ public class PlayerController : MonoBehaviour {
 	
 	void FixedUpdate () {
         CalculateDirection();
-
-
+        
         _animation.Rotate(_direction);
 
         Move();
     }
 
     private void CalculateDirection() {
-        if (_direction.sqrMagnitude < directionThreshold * directionThreshold) {
+        if (_direction == Vector3.zero) {
             _direction = _oldDirection;
         } else {
-            if (_speed.GetCurrentSpeedTier() >= speedTierFromWhereOnlyForward) {
-                _direction.z = 1;
-            }
             _oldDirection = _direction;
         }
     }

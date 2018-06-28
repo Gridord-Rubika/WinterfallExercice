@@ -2196,8 +2196,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9e57723a43cad84590f07344d420516, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  directionThreshold: 0.3
-  speedTierFromWhereOnlyForward: 2
 --- !u!114 &707158812
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2209,6 +2207,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee2aca4827ff4cc449ef9e96bb49ae70, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  directionThreshold: 0.3
+  timeToForcedStop: 0.5
 --- !u!114 &707158813
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2238,7 +2238,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   acceleration: 2
-  directionForwardThreshold: 0.9
+  walkingPercentageNotAccelerating: 0.5
   staminaUsed:
     serializedVersion: 2
     m_Curve:

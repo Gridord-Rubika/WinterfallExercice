@@ -20,6 +20,7 @@ public class PlayerAnimation : MonoBehaviour {
         if (speed != null) {
             speed.SpeedTierIncreased += IncreaseSpeedTier;
             speed.SpeedTierDecreased += DecreaseSpeedTier;
+            speed.ForcedStop += ForcedStop;
         }
     }
 
@@ -49,9 +50,15 @@ public class PlayerAnimation : MonoBehaviour {
 
     public void DecreaseSpeedTier()
     {
-        if (_model_1_Animator != null)
-        {
+        if (_model_1_Animator != null) {
             _model_1_Animator.SetTrigger("DecreaseSpeedTier");
+        }
+    }
+
+    public void ForcedStop()
+    {
+        if (_model_1_Animator != null) {
+            _model_1_Animator.SetTrigger("ForcedStop");
         }
     }
 
