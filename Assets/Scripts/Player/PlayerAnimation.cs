@@ -13,7 +13,7 @@ public class PlayerAnimation : MonoBehaviour {
         _model_1_Animator = model_1.GetComponent<Animator>();
         StaminaSystem stamina = GetComponent<StaminaSystem>();
         if (stamina != null) {
-            stamina.ExhaustedChanged += SetExhausted;
+            stamina.StaminaStateChanged += StamineStateChangedHandler;
         }
 
         SpeedSystem speed = GetComponent<SpeedSystem>();
@@ -66,5 +66,14 @@ public class PlayerAnimation : MonoBehaviour {
     public void Rotate(Vector3 direction)
     {
         model_1.transform.LookAt(model_1.transform.position + Quaternion.LookRotation(direction, Vector3.up) * transform.forward);
+    }
+
+    private void StamineStateChangedHandler(StaminaStates newState)
+    {
+        if(newState == StaminaStates.EXHAUSTED) {
+            SetExhausted(true);
+        } else {
+            SetExhausted(false);
+        }
     }
 }

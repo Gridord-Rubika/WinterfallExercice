@@ -41,7 +41,7 @@ public class SpeedSystem : MonoBehaviour {
         _stamina = GetComponent<StaminaSystem>();
 
         if(_stamina != null) {
-            _stamina.ExhaustedChanged += ExhaustedHandler;
+            _stamina.StaminaStateChanged += StamineStateChangedHandler;
         }
 
         _currentSpeedTier = 0;
@@ -63,24 +63,29 @@ public class SpeedSystem : MonoBehaviour {
 
     public void CalculateSpeed()
     {
-        if(_stamina == null || _stamina.UseStamina(staminaUsed.Evaluate(_currentSpeed) * Time.deltaTime)){
-
-            if (_isAccelerating) {
-                _currentSpeed += acceleration * Time.deltaTime;
-            } else if(_currentSpeedTier == 0 && _direction != Vector3.zero){
-                float speedGoal = _currentMaxSpeed * walkingPercentageNotAccelerating;
-                if (_currentSpeed <= speedGoal) {
-                    _currentSpeed = Mathf.Min(_currentSpeed + acceleration * Time.deltaTime, speedGoal);
-                } else {
-                    _currentSpeed = Mathf.Max(_currentSpeed - acceleration * Time.deltaTime, speedGoal);
-                }
+        float newSpeed = _currentSpeed;
+        if (_isAccelerating) {
+            newSpeed += acceleration * Time.deltaTime;
+        } else if(_currentSpeedTier == 0 && _direction != Vector3.zero){
+            float speedGoal = _currentMaxSpeed * walkingPercentageNotAccelerating;
+            if (newSpeed <= speedGoal) {
+                newSpeed = Mathf.Min(newSpeed + acceleration * Time.deltaTime, speedGoal);
             } else {
-                _currentSpeed -= acceleration * Time.deltaTime;
+                newSpeed = Mathf.Max(newSpeed - acceleration * Time.deltaTime, speedGoal);
             }
-
-            _currentSpeed = Mathf.Clamp(_currentSpeed, _currentMinSpeed, _currentMaxSpeed);
         } else {
-            _currentSpeed = 0;
+            newSpeed -= acceleration * Time.deltaTime;
+        }
+        newSpeed = Mathf.Clamp(newSpeed, _currentMinSpeed, _currentMaxSpeed);
+
+        if (_stamina != null) {
+            if (_stamina.TryUseStamina(staminaUsed.Evaluate(_currentSpeed) * Time.deltaTime)) {
+                _currentSpeed = newSpeed;
+            } else {
+                _currentSpeed = 0;
+            }
+        } else {
+            _currentSpeed = newSpeed;
         }
     }
 
@@ -120,9 +125,11 @@ public class SpeedSystem : MonoBehaviour {
         }
     }
 
-    public void ExhaustedHandler(bool isExhausted)
+    private void StamineStateChangedHandler(StaminaStates newState)
     {
-        ResetSpeed();
+        if (newState == StaminaStates.EXHAUSTED) {
+            ResetSpeed();
+        }
     }
 
     private void ResetSpeed()
