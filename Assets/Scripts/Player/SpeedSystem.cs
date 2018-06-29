@@ -15,18 +15,22 @@ public class SpeedSystem : MonoBehaviour {
     [Range(0,1)]
     [SerializeField] float walkingPercentageNotAccelerating;
     [SerializeField] AnimationCurve staminaUsed;
+    [SerializeField] float timeBeforeStaminaOverUsage;
+    [SerializeField] float staminaOverUsageAddedPercentage;
     [SerializeField] List<SpeedTierValues> speedTierValues;
 
     private int _currentSpeedTier;
     private float _currentMinSpeed;
     private float _currentMaxSpeed;
     private float _currentSpeed;
+
     private bool _isAccelerating = false;
     private Vector3 _direction;
+    private float _staminaOverUsageTimer = 0;
 
     private StaminaSystem _stamina;
-    
 
+    #region Events
     public delegate void IncreaseSpeedTierHandler();
     public event IncreaseSpeedTierHandler SpeedTierIncreased;
 
@@ -35,6 +39,7 @@ public class SpeedSystem : MonoBehaviour {
 
     public delegate void ForcedStopHandler();
     public event ForcedStopHandler ForcedStop;
+    #endregion
 
     void Start ()
     {
@@ -58,15 +63,17 @@ public class SpeedSystem : MonoBehaviour {
 
     private void Update()
     {
-        CalculateSpeed();
+        float newSpeed = CalculateSpeed();
+
+        TryGoToSpeed(newSpeed);
     }
 
-    public void CalculateSpeed()
+    private float CalculateSpeed()
     {
         float newSpeed = _currentSpeed;
         if (_isAccelerating) {
             newSpeed += acceleration * Time.deltaTime;
-        } else if(_currentSpeedTier == 0 && _direction != Vector3.zero){
+        } else if (_currentSpeedTier == 0 && _direction != Vector3.zero) {
             float speedGoal = _currentMaxSpeed * walkingPercentageNotAccelerating;
             if (newSpeed <= speedGoal) {
                 newSpeed = Mathf.Min(newSpeed + acceleration * Time.deltaTime, speedGoal);
@@ -76,10 +83,13 @@ public class SpeedSystem : MonoBehaviour {
         } else {
             newSpeed -= acceleration * Time.deltaTime;
         }
-        newSpeed = Mathf.Clamp(newSpeed, _currentMinSpeed, _currentMaxSpeed);
+        return Mathf.Clamp(newSpeed, _currentMinSpeed, _currentMaxSpeed);
+    }
 
+    private void TryGoToSpeed(float newSpeed)
+    {
         if (_stamina != null) {
-            if (_stamina.TryUseStamina(staminaUsed.Evaluate(_currentSpeed) * Time.deltaTime)) {
+            if (_stamina.TryUseStamina(CalculateStaminaUsage())) {
                 _currentSpeed = newSpeed;
             } else {
                 _currentSpeed = 0;
@@ -87,6 +97,25 @@ public class SpeedSystem : MonoBehaviour {
         } else {
             _currentSpeed = newSpeed;
         }
+    }
+
+    private float CalculateStaminaUsage()
+    {
+        float staminaUsage = 0;
+
+        if(_currentSpeed == _currentMaxSpeed) {
+            _staminaOverUsageTimer += Time.deltaTime;
+        } else {
+            _staminaOverUsageTimer = 0;
+        }
+
+        if (_staminaOverUsageTimer >= timeBeforeStaminaOverUsage) {
+            staminaUsage = staminaUsed.Evaluate(_currentSpeed) * Time.deltaTime * (1 + staminaOverUsageAddedPercentage);
+        } else {
+            staminaUsage = staminaUsed.Evaluate(_currentSpeed) * Time.deltaTime;
+        }
+
+        return staminaUsage;
     }
 
     public void TryIncreaseSpeedTier(Vector3 direction)
@@ -142,6 +171,8 @@ public class SpeedSystem : MonoBehaviour {
         }
     }
 
+    #region Getters/Setters
+
     public float GetCurrentSpeed()
     {
         return _currentSpeed;
@@ -162,4 +193,5 @@ public class SpeedSystem : MonoBehaviour {
         _direction = direction;
     }
 
+    #endregion
 }

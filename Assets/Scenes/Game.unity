@@ -2330,6 +2330,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
+  timeBeforeStaminaOverUsage: 3
+  staminaOverUsageAddedPercentage: 3
   speedTierValues:
   - minSpeed: 0
     maxSpeed: 1
