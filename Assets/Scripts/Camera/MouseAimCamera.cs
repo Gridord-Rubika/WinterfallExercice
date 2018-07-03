@@ -29,7 +29,9 @@ public class MouseAimCamera : MonoBehaviour
     void Start()
     {
         _rb = state.target.GetComponent<Rigidbody>();
-        _lookAtPosition = state.target.TransformPoint(state.lookOffset);
+        if(state.target != null) {
+            _lookAtPosition = state.target.TransformPoint(state.lookOffset);
+        }
     }
 
     void LateUpdate()
@@ -71,7 +73,6 @@ public class MouseAimCamera : MonoBehaviour
             StopCoroutine(_transitionCoroutine);
         }
 
-        Debug.Log("test");
         _oldState = state;
         _newState = newState;
         _rb = _newState.target.GetComponent<Rigidbody>();

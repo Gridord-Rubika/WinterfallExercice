@@ -31,7 +31,7 @@ public struct CameraState
     public float maxXAngle;
     [Header("Others")]
     [Range(1, 179)] public float fieldOfView;
-    [Range(0, 1)] public float screenShakeStrength;
+    [Range(0, 90)] public float screenShakeStrength;
     public float transitionTime;
 
     public static CameraState Lerp(ref CameraState a, ref CameraState b, float t)
