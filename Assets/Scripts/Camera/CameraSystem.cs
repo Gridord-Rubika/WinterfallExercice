@@ -29,29 +29,38 @@ public struct CameraState
     public float angleOffsetY;
     public float minXAngle;
     public float maxXAngle;
+    [Header("Shaking")]
+    public float screenShakeXSpeed;
+    [Range(0, 90)] public float screenShakeXStrength;
+    public float screenShakeYSpeed;
+    [Range(0, 90)] public float screenShakeYStrength;
     [Header("Others")]
     [Range(1, 179)] public float fieldOfView;
-    [Range(0, 90)] public float screenShakeStrength;
     public float transitionTime;
 
     public static CameraState Lerp(ref CameraState a, ref CameraState b, float t)
     {
         CameraState s = new CameraState {
             target = b.target,
-            rotateTarget = b.rotateTarget,
-            transitionTime = b.transitionTime,
-
             lookOffset = Vector3.Lerp(a.lookOffset, b.lookOffset, t),
             distance = Mathf.Lerp(a.distance, b.distance, t),
             cameraRadiusCheck = Mathf.Lerp(a.cameraRadiusCheck, b.cameraRadiusCheck, t),
+
+            rotateTarget = b.rotateTarget,
             rotateSpeedX = Mathf.Lerp(a.rotateSpeedX, b.rotateSpeedX, t),
             rotateSpeedY = Mathf.Lerp(a.rotateSpeedY, b.rotateSpeedY, t),
             angleOffsetX = Mathf.Lerp(a.angleOffsetX, b.angleOffsetX, t),
             angleOffsetY = Mathf.Lerp(a.angleOffsetY, b.angleOffsetY, t),
             minXAngle = Mathf.Lerp(a.minXAngle, b.minXAngle, t),
             maxXAngle = Mathf.Lerp(a.maxXAngle, b.maxXAngle, t),
+
+            screenShakeXSpeed = Mathf.Lerp(a.screenShakeXSpeed, b.screenShakeXSpeed, t),
+            screenShakeXStrength = Mathf.Lerp(a.screenShakeXStrength, b.screenShakeXStrength, t),
+            screenShakeYSpeed = Mathf.Lerp(a.screenShakeYSpeed, b.screenShakeYSpeed, t),
+            screenShakeYStrength = Mathf.Lerp(a.screenShakeYStrength, b.screenShakeYStrength, t),
+
             fieldOfView = Mathf.Lerp(a.fieldOfView, b.fieldOfView, t),
-            screenShakeStrength = Mathf.Lerp(a.screenShakeStrength, b.screenShakeStrength, t)
+            transitionTime = b.transitionTime
         };
         
         return s;

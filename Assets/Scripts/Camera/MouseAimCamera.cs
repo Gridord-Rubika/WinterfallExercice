@@ -13,6 +13,10 @@ public class MouseAimCamera : MonoBehaviour
     private CameraState _newState;
     private float _angleX = 0;
     private float _angleY = 0;
+    private float _screenShakeX = 0;
+    private float _screenShakeY = 0;
+    private float _shakeTimeX = 0;
+    private float _shakeTimeY = 0;
     private Vector3 _lookAtPosition;
     private bool _transitioning = false;
 
@@ -34,22 +38,33 @@ public class MouseAimCamera : MonoBehaviour
         }
     }
 
+    private void FixedUpdate()
+    {
+        if (_rb != null && state.rotateTarget) {
+            _rb.MoveRotation(Quaternion.Euler(0, _angleY, 0));
+        }
+    }
+
     void LateUpdate()
     {
         float horizontal = Input.GetAxis("Mouse X") * state.rotateSpeedX;
         float vertical = Input.GetAxis("Mouse Y") * state.rotateSpeedY;
 
+        _angleX = Mathf.Clamp(_angleX - vertical, state.minXAngle, state.maxXAngle);
         _angleY += horizontal;
 
-        if (_rb != null && state.rotateTarget) {
-            _rb.MoveRotation(Quaternion.Euler(0, state.angleOffsetY + _angleY, 0));
-        }
+        _shakeTimeX += Time.deltaTime * state.screenShakeXSpeed;
+        _shakeTimeY += Time.deltaTime * state.screenShakeYSpeed;
 
-        _angleX = Mathf.Clamp(_angleX - vertical, state.minXAngle, state.maxXAngle);
-        Quaternion rotation = Quaternion.Euler(state.angleOffsetX + _angleX, state.angleOffsetY + _angleY, 0);
+        _screenShakeX = Mathf.Sin(_shakeTimeX) * state.screenShakeXStrength;
+        _screenShakeY = Mathf.Cos(_shakeTimeY) * state.screenShakeYStrength;
+                
+        Quaternion rotation = Quaternion.Euler(state.angleOffsetX + _angleX + _screenShakeX, state.angleOffsetY + _angleY + _screenShakeY, 0);
+
         if (!_transitioning) {
             _lookAtPosition = state.target.TransformPoint(state.lookOffset);
         }
+
         transform.position = _lookAtPosition + (rotation * new Vector3(0,0, -CalculateDistance(_lookAtPosition)));
         
         transform.LookAt(_lookAtPosition);
