@@ -40,7 +40,7 @@ public class PlayerAnimation : MonoBehaviour {
         }
     }
 
-    public void IncreaseSpeedTier()
+    public void IncreaseSpeedTier(SpeedTierValues newSpeedTierValues)
     {
         if (_model_1_Animator != null)
         {
@@ -48,14 +48,14 @@ public class PlayerAnimation : MonoBehaviour {
         }
     }
 
-    public void DecreaseSpeedTier()
+    public void DecreaseSpeedTier(SpeedTierValues newSpeedTierValues)
     {
         if (_model_1_Animator != null) {
             _model_1_Animator.SetTrigger("DecreaseSpeedTier");
         }
     }
 
-    public void ForcedStop()
+    public void ForcedStop(SpeedTierValues newSpeedTierValues)
     {
         if (_model_1_Animator != null) {
             _model_1_Animator.SetTrigger("ForcedStop");

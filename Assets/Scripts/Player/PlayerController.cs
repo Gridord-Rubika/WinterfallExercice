@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour {
     private Rigidbody _rb;
     private PlayerAnimation _animation;
     private SpeedSystem _speed;
+    [SerializeField] CameraSystem _camera;
 
     private Vector3 _direction;
     private Vector3 _oldDirection;
@@ -49,8 +50,12 @@ public class PlayerController : MonoBehaviour {
         if (currentSpeed != 0) {
             _rb.MovePosition(transform.position + Quaternion.LookRotation(_direction, Vector3.up) * transform.forward * currentSpeed * Time.deltaTime);
             _animation.SetMoving(true);
+            if(_camera.GetCurrentCameraStateName() == CameraStateName.IDLE) {
+                _camera.ChangeState(_speed.GetCurrentSpeedTierValues().cameraStateName);
+            }
         } else {
             _animation.SetMoving(false);
+            _camera.ChangeState(CameraStateName.IDLE);
         }
     }
 

@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpeedSystem : MonoBehaviour {
+[System.Serializable]
+public struct SpeedTierValues
+{
+    public float minSpeed;
+    public float maxSpeed;
+    public CameraStateName cameraStateName;
+}
 
-    [System.Serializable]
-    private struct SpeedTierValues
-    {
-        public float minSpeed;
-        public float maxSpeed;
-    }
+public class SpeedSystem : MonoBehaviour {
 
     [SerializeField] float acceleration;
     [Range(0,1)]
@@ -31,13 +32,13 @@ public class SpeedSystem : MonoBehaviour {
     private StaminaSystem _stamina;
 
     #region Events
-    public delegate void IncreaseSpeedTierHandler();
+    public delegate void IncreaseSpeedTierHandler(SpeedTierValues newSpeedTierValues);
     public event IncreaseSpeedTierHandler SpeedTierIncreased;
 
-    public delegate void DecreaseSpeedTierHandler();
+    public delegate void DecreaseSpeedTierHandler(SpeedTierValues newSpeedTierValues);
     public event DecreaseSpeedTierHandler SpeedTierDecreased;
 
-    public delegate void ForcedStopHandler();
+    public delegate void ForcedStopHandler(SpeedTierValues newSpeedTierValues);
     public event ForcedStopHandler ForcedStop;
     #endregion
 
@@ -122,12 +123,13 @@ public class SpeedSystem : MonoBehaviour {
     {
         if (_currentSpeedTier < speedTierValues.Count - 1 && _currentSpeedTier >= 0) {
             if (_currentSpeed == _currentMaxSpeed) {
-                if (SpeedTierIncreased != null) {
-                    SpeedTierIncreased.Invoke();
-                }
                 _currentSpeedTier++;
                 _currentMinSpeed = speedTierValues[_currentSpeedTier].minSpeed;
                 _currentMaxSpeed = speedTierValues[_currentSpeedTier].maxSpeed;
+
+                if (SpeedTierIncreased != null) {
+                    SpeedTierIncreased.Invoke(speedTierValues[_currentSpeedTier]);
+                }
             }
         }
     }
@@ -136,12 +138,13 @@ public class SpeedSystem : MonoBehaviour {
     {
         if (_currentSpeedTier < speedTierValues.Count && _currentSpeedTier > 0) {
             if (_currentSpeed == _currentMinSpeed) {
-                if (SpeedTierDecreased != null) {
-                    SpeedTierDecreased.Invoke();
-                }
                 _currentSpeedTier--;
                 _currentMinSpeed = speedTierValues[_currentSpeedTier].minSpeed;
                 _currentMaxSpeed = speedTierValues[_currentSpeedTier].maxSpeed;
+
+                if (SpeedTierDecreased != null) {
+                    SpeedTierDecreased.Invoke(speedTierValues[_currentSpeedTier]);
+                }
             }
         }
     }
@@ -150,7 +153,6 @@ public class SpeedSystem : MonoBehaviour {
     {
         if (_currentSpeedTier > 0) {
             ResetSpeed();
-            ForcedStop.Invoke();
         }
     }
 
@@ -168,6 +170,7 @@ public class SpeedSystem : MonoBehaviour {
             _currentSpeed = 0;
             _currentMinSpeed = speedTierValues[0].minSpeed;
             _currentMaxSpeed = speedTierValues[0].maxSpeed;
+            ForcedStop.Invoke(speedTierValues[_currentSpeedTier]);
         }
     }
 
@@ -181,6 +184,11 @@ public class SpeedSystem : MonoBehaviour {
     public int GetCurrentSpeedTier()
     {
         return _currentSpeedTier;
+    }
+
+    public SpeedTierValues GetCurrentSpeedTierValues()
+    {
+        return speedTierValues[_currentSpeedTier];
     }
 
     public void SetIsAccelerating(bool isAccelerating)
