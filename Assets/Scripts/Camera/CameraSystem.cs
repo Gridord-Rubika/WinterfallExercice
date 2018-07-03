@@ -30,9 +30,32 @@ public struct CameraState
     public float minXAngle;
     public float maxXAngle;
     [Header("Others")]
-    public float fieldOfView;
+    [Range(1, 179)] public float fieldOfView;
     [Range(0, 1)] public float screenShakeStrength;
     public float transitionTime;
+
+    public static CameraState Lerp(ref CameraState a, ref CameraState b, float t)
+    {
+        CameraState s = new CameraState {
+            target = b.target,
+            rotateTarget = b.rotateTarget,
+            transitionTime = b.transitionTime,
+
+            lookOffset = Vector3.Lerp(a.lookOffset, b.lookOffset, t),
+            distance = Mathf.Lerp(a.distance, b.distance, t),
+            cameraRadiusCheck = Mathf.Lerp(a.cameraRadiusCheck, b.cameraRadiusCheck, t),
+            rotateSpeedX = Mathf.Lerp(a.rotateSpeedX, b.rotateSpeedX, t),
+            rotateSpeedY = Mathf.Lerp(a.rotateSpeedY, b.rotateSpeedY, t),
+            angleOffsetX = Mathf.Lerp(a.angleOffsetX, b.angleOffsetX, t),
+            angleOffsetY = Mathf.Lerp(a.angleOffsetY, b.angleOffsetY, t),
+            minXAngle = Mathf.Lerp(a.minXAngle, b.minXAngle, t),
+            maxXAngle = Mathf.Lerp(a.maxXAngle, b.maxXAngle, t),
+            fieldOfView = Mathf.Lerp(a.fieldOfView, b.fieldOfView, t),
+            screenShakeStrength = Mathf.Lerp(a.screenShakeStrength, b.screenShakeStrength, t)
+        };
+        
+        return s;
+    }
 }
 
 public class CameraSystem : MonoBehaviour {
@@ -50,18 +73,18 @@ public class CameraSystem : MonoBehaviour {
             _mouseAimCamera = gameObject.AddComponent<MouseAimCamera>();
         }
 
-        ChangeState(startingStateName);
+        ChangeState(startingStateName, true);
 
         speed.SpeedTierIncreased += SpeedTierChangeHandler;
         speed.SpeedTierDecreased += SpeedTierChangeHandler;
         speed.ForcedStop += SpeedTierChangeHandler;
     }
 
-    public void ChangeState(CameraStateName newStateName)
+    public void ChangeState(CameraStateName newStateName, bool instantChange)
     {
         for(int i = 0; i < cameraStates.Count; i++) {
             if(cameraStates[i].name == newStateName) {
-                _mouseAimCamera.ChangeState(cameraStates[i]);
+                _mouseAimCamera.ChangeState(cameraStates[i], instantChange);
                 _currentStateIndex = i;
                 return;
             }
@@ -72,7 +95,7 @@ public class CameraSystem : MonoBehaviour {
 
     private void SpeedTierChangeHandler(SpeedTierValues newSpeedTierValues)
     {
-        ChangeState(newSpeedTierValues.cameraStateName);
+        ChangeState(newSpeedTierValues.cameraStateName, false);
     }
 
     public CameraState GetCurrentCameraState()

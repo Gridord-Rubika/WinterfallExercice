@@ -51,11 +51,13 @@ public class PlayerController : MonoBehaviour {
             _rb.MovePosition(transform.position + Quaternion.LookRotation(_direction, Vector3.up) * transform.forward * currentSpeed * Time.deltaTime);
             _animation.SetMoving(true);
             if(_camera.GetCurrentCameraStateName() == CameraStateName.IDLE) {
-                _camera.ChangeState(_speed.GetCurrentSpeedTierValues().cameraStateName);
+                _camera.ChangeState(_speed.GetCurrentSpeedTierValues().cameraStateName, false);
             }
         } else {
             _animation.SetMoving(false);
-            _camera.ChangeState(CameraStateName.IDLE);
+            if(_camera.GetCurrentCameraStateName() != CameraStateName.IDLE) {
+                _camera.ChangeState(CameraStateName.IDLE, false);
+            }
         }
     }
 
