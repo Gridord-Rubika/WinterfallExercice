@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MouseAimCamera : MonoBehaviour
+public class CameraBehaviour : MonoBehaviour
 {
     [SerializeField] LayerMask distanceCheckLayerMask;
     [SerializeField] CameraState state;
 
     private Rigidbody _rb;
     private Camera _cam;
+    private CameraSystem _cameraSystem;
     private CameraState _oldState;
     private CameraState _newState;
     private float _angleX = 0;
@@ -26,7 +27,14 @@ public class MouseAimCamera : MonoBehaviour
     {
         _cam = GetComponent<Camera>();
         if (_cam == null) {
-            Debug.LogWarning("No camera on object with MouseAimCamera : " + gameObject.name);
+            Debug.LogWarning("No camera on object with CameraBehaviour : " + gameObject.name);
+        }
+
+        _cameraSystem = GetComponent<CameraSystem>();
+        if (_cameraSystem == null) {
+            Debug.LogWarning("No CameraSystem on object with CameraBehaviour : " + gameObject.name);
+        } else {
+            _cameraSystem.CameraStateChanged += ChangeState;
         }
     }
 

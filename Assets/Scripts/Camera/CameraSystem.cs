@@ -37,10 +37,12 @@ public struct CameraState
     [Header("Others")]
     [Range(1, 179)] public float fieldOfView;
     public float transitionTime;
+    public GameObject particleEffect;
 
     public static CameraState Lerp(ref CameraState a, ref CameraState b, float t)
     {
         CameraState s = new CameraState {
+            name = b.name,
             target = b.target,
             lookOffset = Vector3.Lerp(a.lookOffset, b.lookOffset, t),
             distance = Mathf.Lerp(a.distance, b.distance, t),
@@ -60,7 +62,8 @@ public struct CameraState
             screenShakeYStrength = Mathf.Lerp(a.screenShakeYStrength, b.screenShakeYStrength, t),
 
             fieldOfView = Mathf.Lerp(a.fieldOfView, b.fieldOfView, t),
-            transitionTime = b.transitionTime
+            transitionTime = b.transitionTime,
+            particleEffect = b.particleEffect
         };
         
         return s;
@@ -73,15 +76,12 @@ public class CameraSystem : MonoBehaviour {
     [SerializeField] List<CameraState> cameraStates;
     [SerializeField] CameraStateName startingStateName;
 
-    private MouseAimCamera _mouseAimCamera;
-    private int _currentStateIndex;
+    private int _currentStateIndex = -1;
+
+    public delegate void CameraStateHandler(CameraState newCameraState, bool instantChange);
+    public event CameraStateHandler CameraStateChanged;
 
     void Start () {
-        _mouseAimCamera = GetComponent<MouseAimCamera>();
-        if(_mouseAimCamera == null) {
-            _mouseAimCamera = gameObject.AddComponent<MouseAimCamera>();
-        }
-
         ChangeState(startingStateName, true);
 
         speed.SpeedTierIncreased += SpeedTierChangeHandler;
@@ -93,8 +93,12 @@ public class CameraSystem : MonoBehaviour {
     {
         for(int i = 0; i < cameraStates.Count; i++) {
             if(cameraStates[i].name == newStateName) {
-                _mouseAimCamera.ChangeState(cameraStates[i], instantChange);
-                _currentStateIndex = i;
+                if (i != _currentStateIndex) {
+                    if (CameraStateChanged != null) {
+                        CameraStateChanged.Invoke(cameraStates[i], instantChange);
+                    }
+                    _currentStateIndex = i;
+                }
                 return;
             }
         }
