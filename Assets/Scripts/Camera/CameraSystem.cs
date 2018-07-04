@@ -72,7 +72,7 @@ public struct CameraState
 
 public class CameraSystem : MonoBehaviour {
 
-    [SerializeField] SpeedSystem speed;
+    [SerializeField] SpeedSystem speedSystem;
     [SerializeField] List<CameraState> cameraStates;
     [SerializeField] CameraStateName startingStateName;
 
@@ -84,9 +84,9 @@ public class CameraSystem : MonoBehaviour {
     void Start () {
         ChangeState(startingStateName, true);
 
-        speed.SpeedTierIncreased += SpeedTierChangeHandler;
-        speed.SpeedTierDecreased += SpeedTierChangeHandler;
-        speed.ForcedStop += SpeedTierChangeHandler;
+        speedSystem.SpeedTierIncreased += SpeedTierChangeHandler;
+        speedSystem.SpeedTierDecreased += SpeedTierChangeHandler;
+        speedSystem.ForcedStop += SpeedTierChangeHandler;
     }
 
     public void ChangeState(CameraStateName newStateName, bool instantChange)

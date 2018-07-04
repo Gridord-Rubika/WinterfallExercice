@@ -5,12 +5,12 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(StaminaSystem))]
 [RequireComponent(typeof(SpeedSystem))]
-public class PlayerController : MonoBehaviour {
+public class MovementController : MonoBehaviour {
     
     private Rigidbody _rb;
-    private PlayerAnimation _animation;
-    private SpeedSystem _speed;
-    [SerializeField] CameraSystem _camera;
+    private MovementAnimation _animation;
+    private SpeedSystem _speedSystem;
+    [SerializeField] CameraSystem _cameraSystem;
 
     private Vector3 _direction;
     private Vector3 _oldDirection;
@@ -22,8 +22,8 @@ public class PlayerController : MonoBehaviour {
             _rb = gameObject.AddComponent<Rigidbody>();
         }
 
-        _animation = GetComponent<PlayerAnimation>();
-        _speed = GetComponent<SpeedSystem>();
+        _animation = GetComponent<MovementAnimation>();
+        _speedSystem = GetComponent<SpeedSystem>();
 
         _direction = Vector3.forward;
         _oldDirection = _direction;
@@ -46,17 +46,17 @@ public class PlayerController : MonoBehaviour {
     }
 
     private void Move() {
-        float currentSpeed = _speed.GetCurrentSpeed();
+        float currentSpeed = _speedSystem.GetCurrentSpeed();
         if (currentSpeed != 0) {
             _rb.MovePosition(transform.position + Quaternion.LookRotation(_direction, Vector3.up) * transform.forward * currentSpeed * Time.deltaTime);
             _animation.SetMoving(true);
-            if(_camera.GetCurrentCameraStateName() == CameraStateName.IDLE) {
-                _camera.ChangeState(_speed.GetCurrentSpeedTierValues().cameraStateName, false);
+            if(_cameraSystem.GetCurrentCameraStateName() == CameraStateName.IDLE) {
+                _cameraSystem.ChangeState(_speedSystem.GetCurrentSpeedTierValues().cameraStateName, false);
             }
         } else {
             _animation.SetMoving(false);
-            if(_camera.GetCurrentCameraStateName() != CameraStateName.IDLE) {
-                _camera.ChangeState(CameraStateName.IDLE, false);
+            if(_cameraSystem.GetCurrentCameraStateName() != CameraStateName.IDLE) {
+                _cameraSystem.ChangeState(CameraStateName.IDLE, false);
             }
         }
     }

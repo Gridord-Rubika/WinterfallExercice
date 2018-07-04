@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(PlayerController))]
-public class PlayerInput : MonoBehaviour {
+[RequireComponent(typeof(MovementController))]
+public class MovementInput : MonoBehaviour {
 
     [SerializeField] float directionThreshold;
     [SerializeField] float timeToForcedStop;
 
-    private PlayerController _controller;
+    private MovementController _controller;
     private SpeedSystem _speed;
 
     private bool _incPressed = false;
@@ -17,7 +17,7 @@ public class PlayerInput : MonoBehaviour {
     private bool _forcedStopAlreadyCalled = false;
 
     void Start () {
-        _controller = GetComponent<PlayerController>();
+        _controller = GetComponent<MovementController>();
         _speed = GetComponent<SpeedSystem>();
     }
 	

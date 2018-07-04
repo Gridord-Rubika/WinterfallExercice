@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class StaminaDisplayUI : MonoBehaviour {
 
-    [SerializeField] StaminaSystem stamina;
+    [SerializeField] StaminaSystem staminaSystem;
 
     [SerializeField] Image staminaGauge;
     [SerializeField] Color colorFullStamina;
@@ -13,9 +13,9 @@ public class StaminaDisplayUI : MonoBehaviour {
     [SerializeField] Text StaminaStateText;
     
     void Start () {
-		if(stamina != null) {
-            stamina.StaminaStateChanged += DisplayState;
-            DisplayState(stamina.GetStaminaState());
+		if(staminaSystem != null) {
+            staminaSystem.StaminaStateChanged += DisplayState;
+            DisplayState(staminaSystem.GetStaminaState());
         } else {
             Debug.LogWarning("No StaminaSystem given to StaminaDisplayUI on object : " + gameObject.name);
         }
@@ -23,8 +23,8 @@ public class StaminaDisplayUI : MonoBehaviour {
     }
 	
 	void Update () {
-		if(stamina != null) {
-            float percentage = stamina.GetPercentageRemainingStamina();
+		if(staminaSystem != null) {
+            float percentage = staminaSystem.GetPercentageRemainingStamina();
 
             staminaGauge.fillAmount = percentage;
             staminaGauge.color = Color.Lerp(colorEmptyStamina, colorFullStamina, percentage);

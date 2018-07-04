@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerAnimation : MonoBehaviour {
+public class MovementAnimation : MonoBehaviour {
     
-    [SerializeField] GameObject model_1;
+    [SerializeField] GameObject model;
 
-    private Animator _model_1_Animator;
+    private Animator _modelAnimator;
 
     void Start ()
     {
-        _model_1_Animator = model_1.GetComponent<Animator>();
+        _modelAnimator = model.GetComponent<Animator>();
         StaminaSystem stamina = GetComponent<StaminaSystem>();
         if (stamina != null) {
             stamina.StaminaStateChanged += StamineStateChangedHandler;
@@ -26,46 +26,46 @@ public class PlayerAnimation : MonoBehaviour {
 
     public void SetMoving(bool isMoving)
     {
-        if (_model_1_Animator != null)
+        if (_modelAnimator != null)
         {
-            _model_1_Animator.SetBool("Moving", isMoving);
+            _modelAnimator.SetBool("Moving", isMoving);
         }
     }
 
     public void SetExhausted(bool isExhausted)
     {
-        if (_model_1_Animator != null)
+        if (_modelAnimator != null)
         {
-            _model_1_Animator.SetBool("Exhausted", isExhausted);
+            _modelAnimator.SetBool("Exhausted", isExhausted);
         }
     }
 
     public void IncreaseSpeedTier(SpeedTierValues newSpeedTierValues)
     {
-        if (_model_1_Animator != null)
+        if (_modelAnimator != null)
         {
-            _model_1_Animator.SetTrigger("IncreaseSpeedTier");
+            _modelAnimator.SetTrigger("IncreaseSpeedTier");
         }
     }
 
     public void DecreaseSpeedTier(SpeedTierValues newSpeedTierValues)
     {
-        if (_model_1_Animator != null) {
-            _model_1_Animator.SetTrigger("DecreaseSpeedTier");
+        if (_modelAnimator != null) {
+            _modelAnimator.SetTrigger("DecreaseSpeedTier");
         }
     }
 
     public void ForcedStop(SpeedTierValues newSpeedTierValues)
     {
-        if (_model_1_Animator != null) {
-            _model_1_Animator.SetTrigger("ForcedStop");
+        if (_modelAnimator != null) {
+            _modelAnimator.SetTrigger("ForcedStop");
         }
     }
 
 
     public void Rotate(Vector3 direction)
     {
-        model_1.transform.LookAt(model_1.transform.position + Quaternion.LookRotation(direction, Vector3.up) * transform.forward);
+        model.transform.LookAt(model.transform.position + Quaternion.LookRotation(direction, Vector3.up) * transform.forward);
     }
 
     private void StamineStateChangedHandler(StaminaStates newState)

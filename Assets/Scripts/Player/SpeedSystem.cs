@@ -29,7 +29,7 @@ public class SpeedSystem : MonoBehaviour {
     private Vector3 _direction;
     private float _staminaOverUsageTimer = 0;
 
-    private StaminaSystem _stamina;
+    private StaminaSystem _staminaSystem;
 
     #region Events
     public delegate void IncreaseSpeedTierHandler(SpeedTierValues newSpeedTierValues);
@@ -44,10 +44,10 @@ public class SpeedSystem : MonoBehaviour {
 
     void Start ()
     {
-        _stamina = GetComponent<StaminaSystem>();
+        _staminaSystem = GetComponent<StaminaSystem>();
 
-        if(_stamina != null) {
-            _stamina.StaminaStateChanged += StamineStateChangedHandler;
+        if(_staminaSystem != null) {
+            _staminaSystem.StaminaStateChanged += StamineStateChangedHandler;
         }
 
         _currentSpeedTier = 0;
@@ -89,8 +89,8 @@ public class SpeedSystem : MonoBehaviour {
 
     private void TryGoToSpeed(float newSpeed)
     {
-        if (_stamina != null) {
-            if (_stamina.TryUseStamina(CalculateStaminaUsage())) {
+        if (_staminaSystem != null) {
+            if (_staminaSystem.TryUseStamina(CalculateStaminaUsage())) {
                 _currentSpeed = newSpeed;
             } else {
                 _currentSpeed = 0;
